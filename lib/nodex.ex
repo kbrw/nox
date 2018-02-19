@@ -9,7 +9,7 @@ defmodule Nodex do
   """
   @spec which(String.t) :: Path.t | nil
   def which(exe) do
-    case System.cmd("which", [exe], env: Nvm.env()) do
+    case System.cmd("which", [exe], env: [{"PATH", Nvm.bindir()}]) do
       {out, 0} -> String.trim(out)
       {_, 1} -> nil
     end

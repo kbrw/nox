@@ -22,11 +22,12 @@ defmodule Nodex.Nvm do
   @doc false
   def env do
     bindir = bindir()
+    path0 = System.get_env("PATH")
     [
       {"NVM_DIR", basedir()},
       {"NVM_CD_FLAGS", ""},
       {"NVM_BIN", bindir},
-      {"PATH", bindir}
+      {"PATH", "#{bindir}:#{path0}"}
     ]
   end
 

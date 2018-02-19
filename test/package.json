@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "webpack": "^1.4.13",
+    "react": "^0.13.0"
+  }
+}
