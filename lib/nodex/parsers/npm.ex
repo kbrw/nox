@@ -6,9 +6,9 @@ defmodule Nodex.Parsers.Npm do
   
   require Logger
 
-  defstruct errors: [], warnings: [], werror: false
+  defstruct errors: [], warnings: []
 
-  def init(werror), do: %__MODULE__{ werror: werror }
+  def init(_), do: %__MODULE__{}
 
   def parse("", s), do: s
   def parse("npm WARN " <> msg, %__MODULE__{ warnings: warnings }=s) do

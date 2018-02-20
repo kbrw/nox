@@ -5,16 +5,23 @@ defmodule Nodex.Npm do
   alias Nodex.Semver
   alias Nodex.Parsers.Npm, as: Parser
 
+  @typedoc "Options used by the `install` function"
+  @type install_opts :: [install_opt]
+
+  @typedoc "Option values used by the `install` function"
+  @type install_opt ::
+          {:werror, boolean}
+  
   @doc """
   Launch npm install in the given dir
   """
-  @spec install(Path.t) :: :ok | {:error, errors :: [String.t]}
-  def install(dir) do
-    stream = Nodex.Cli.stream({Parser, false})
-    case System.cmd("npm", ["install"], cd: dir, into: stream, env: Nodex.Nvm.env(), stderr_to_stdout: true) do
-      {%Parser{}, 0} -> :ok
-      {%Parser{ errors: errors }, 1} -> {:error, errors}
-    end
+  @spec install(Path.t, install_opts) :: {:ok, warnings :: [String.t]} | {:error, {code :: number, warnings :: [String.t],  errors :: [String.t]}}
+  def install(dir, opts \\ []) when is_list(opts) do
+    werror = Keyword.get(opts, :werror, false)
+    
+    stream = Nodex.Cli.stream({Parser, []})
+    {parser, code} = System.cmd("npm", ["install"], cd: dir, into: stream, env: Nodex.Nvm.env(), stderr_to_stdout: true)
+    finalize(code, parser, werror)
   end
 
   @doc """
@@ -29,5 +36,15 @@ defmodule Nodex.Npm do
     end
   end
 
-  defp exe, do: Nodex.which("npm")
+  @doc """
+  Returns full path to npm executable
+  """
+  def exe, do: Nodex.which("npm")
+
+  ###
+  ### Priv
+  ###
+  defp finalize(0, %Parser{ warnings: [], errors: [] }, true), do: {:ok, []}
+  defp finalize(0, %Parser{ warnings: warnings, errors: [] }, false), do: {:ok, warnings}
+  defp finalize(code, parser, _), do: {:error, {code, parser.warnings, parser.errors}}
 end

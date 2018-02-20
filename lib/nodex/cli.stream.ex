@@ -4,34 +4,31 @@ defmodule Nodex.Cli.Stream do
   alias Nodex.Cli
 
   defstruct acc: "", parser: nil
-  
-  def get_line(<< ?\n, rest :: binary >>, %{ acc: acc }=stream), do: {:ok, acc, %{ stream | acc: rest }}
-  def get_line("", stream), do: {:more, stream}
-  def get_line(<< c :: utf8, rest :: binary >>, %Cli.Stream{ acc: acc }=stream) do
-    get_line(rest, %{ stream | acc: << acc :: binary, c :: utf8 >> })
+
+  def into(<< ?\n, rest :: binary >>, %{ acc: "" }=stream), do: into(rest, stream)
+  def into(<< ?\n, rest :: binary >>, %{ acc: acc, parser: nil }=stream) do
+    Logger.info(acc)
+    into(rest, %{ stream | acc: "" })
+  end
+  def into(<< ?\n, rest :: binary >>, %{ acc: acc, parser: {mod, state0} }=stream) do
+    try do
+      state = mod.parse(acc, state0)
+      into(rest, %{ stream | acc: "", parser: {mod, state} })
+    rescue _ ->
+	into(rest, %{ stream | acc: "" })
+    end
+  end
+  def into("", stream), do: stream
+  def into(<< c :: utf8, rest :: binary >>, %Cli.Stream{ acc: acc }=stream) do
+    into(rest, %{ stream | acc: << acc :: binary, c :: utf8 >> })
   end
 
   defimpl Collectable do
     def into(%Cli.Stream{}=stream0) do
       collector = fn
-	stream, {:cont, data} ->
-	  case Cli.Stream.get_line(data, stream) do
-	    {:ok, line, %Cli.Stream{ parser: nil }=stream} ->
-	      Logger.info(line)
-	      stream
-	    {:ok, line, %Cli.Stream{ parser: {parser, parser_state0} }=stream} ->
-	      try do
-		parser_state = parser.parse(line, parser_state0)
-		%{ stream | parser: {parser, parser_state} }
-	      rescue _ ->
-		  stream
-	      end
-	    {:more, stream} -> stream
-	  end
-	%Cli.Stream{ parser: {parser, parser_state} }, :done ->
-	  parser.terminate(parser_state)
-	_acc, :halt ->
-	  :ok
+	stream, {:cont, data} -> Cli.Stream.into(data, stream)
+	%Cli.Stream{ parser: {parser, parser_state} }, :done -> parser.terminate(parser_state)
+	_acc, :halt -> :ok
       end
       {stream0, collector}
     end
