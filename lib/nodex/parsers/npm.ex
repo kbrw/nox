@@ -1,6 +1,6 @@
 defmodule Nodex.Parsers.Npm do
   @moduledoc """
-  Parser for node
+  Parser for NPM
   """
   use Nodex.Parser
   
