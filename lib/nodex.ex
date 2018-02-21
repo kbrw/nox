@@ -14,4 +14,10 @@ defmodule Nodex do
       {_, 1} -> nil
     end
   end
+
+  @doc """
+  Returns env for running node related commands
+  """
+  @spec env() :: [{String.t, String.t}]
+  def env, do: Nodex.Nvm.env()
 end
