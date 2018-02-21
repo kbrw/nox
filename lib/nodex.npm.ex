@@ -98,7 +98,8 @@ defmodule Nodex.Npm do
   defp do_install(dir, args, opts) do
     werror = Keyword.get(opts, :werror, false)
     stream = Nodex.Cli.stream({Parser, []})
-    {parser, code} = System.cmd("npm", args, cd: dir, into: stream, env: env(dir), stderr_to_stdout: true)
+    npm_exe = Nodex.which("npm")
+    {parser, code} = System.cmd(npm_exe, args, cd: dir, into: stream, env: env(dir), stderr_to_stdout: true)
     do_finalize(code, parser, werror)
   end
   

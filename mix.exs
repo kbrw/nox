@@ -8,8 +8,8 @@ defmodule Nodex.MixProject do
       elixir: ">= 1.3.0",
       start_permanent: Mix.env() == :prod,
       versions: [
-	nvm: "v0.33.8",
-	node: "8.9",
+	nvm: "v1.1.2",
+	node: "8.9.4",
 	npm: "5.6"
       ],
       deps: deps(),

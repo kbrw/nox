@@ -2,32 +2,27 @@ defmodule Nodex.Nvm do
   @moduledoc """
   NVM wrapper
   """
-
-  @nvm_env "NVM_DIR= NVM_CD_FLAGS= NVM_IOJS_ORG_MIRROR= NVM_PATH= NVM_RC_VERSION= NVM_BIN= NVM_NODEJS_ORG_MIRROR= "
-
   alias Nodex.Semver
 
   @doc """
   Run NVM command
   """
-  @spec run(String.t) :: charlist
+  @spec run(String.t) :: :ok | {:error, code :: integer}
   def run(args) do
-    if File.exists?(Path.join(basedir(), "nvm.sh")) do
-      :os.cmd('#{@nvm_env} NVM_DIR=#{basedir()} . #{basedir()}/nvm.sh && nvm #{args}')
-    else
-      :ok
+    case System.cmd("nodenv", String.split(args), env: env(), stderr_to_stdout: true, into: Nodex.Cli.stream()) do
+      {_, 0} -> :ok
+      {_, code} -> {:error, code}
     end
   end
 
   @doc false
   def env do
-    bindir = bindir()
+    bindir = Path.join basedir(), "bin"
+    shimsdir = bindir()
     path0 = System.get_env("PATH")
     [
-      {"NVM_DIR", basedir()},
-      {"NVM_CD_FLAGS", ""},
-      {"NVM_BIN", bindir},
-      {"PATH", "#{bindir}:#{path0}"}
+      {"PATH", "#{shimsdir}:#{bindir}:#{path0}"},
+      {"NODENV_ROOT", basedir()}
     ]
   end
 
@@ -35,20 +30,14 @@ defmodule Nodex.Nvm do
   def basedir, do: Path.join :code.priv_dir(:nodex), "nvm"
 
   @doc false
-  def bindir do
-    case Path.wildcard("#{basedir()}/versions/node/*/bin") do
-      [] -> nil
-      [ bindir ] -> bindir
-    end
-  end
+  def bindir, do: Path.join basedir(), "shims"
 
   @doc """
   Returns installed nvm version
   """
   def version do
-    with {:ok, data} <- File.read(Path.join(basedir(), "package.json")),
-	 {:ok, json} <- Poison.decode(data),
-	 {_, _, _, _}=semver <- Semver.parse(json["version"]) do
+    with out <- :os.cmd('git -C #{basedir()} describe 2> /dev/null'),
+	 {_, _, _, _}=semver <- Semver.parse(String.trim("#{out}")) do
       semver
     else _ -> :error
     end
