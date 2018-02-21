@@ -9,7 +9,8 @@ defmodule Nodex.Nvm do
   """
   @spec run(String.t) :: :ok | {:error, code :: integer}
   def run(args) do
-    case System.cmd("nodenv", String.split(args), env: env(), stderr_to_stdout: true, into: Nodex.Cli.stream()) do
+    exe = Path.join [basedir(), "bin", "nodenv"]
+    case System.cmd(exe, String.split(args), env: env(), stderr_to_stdout: true, into: Nodex.Cli.stream()) do
       {_, 0} -> :ok
       {_, code} -> {:error, code}
     end
@@ -17,11 +18,10 @@ defmodule Nodex.Nvm do
 
   @doc false
   def env do
-    bindir = Path.join basedir(), "bin"
-    shimsdir = bindir()
+    bindir = bindir()
     path0 = System.get_env("PATH")
     [
-      {"PATH", "#{shimsdir}:#{bindir}:#{path0}"},
+      {"PATH", "#{bindir}:#{path0}"},
       {"NODENV_ROOT", basedir()}
     ]
   end
