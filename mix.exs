@@ -7,6 +7,8 @@ defmodule Nodex.MixProject do
       version: "0.1.0",
       elixir: ">= 1.3.0",
       start_permanent: Mix.env() == :prod,
+      description: description(),
+      package: package(),
       versions: [
 	nvm: "v1.1.2",
 	node: "8.9.4",
@@ -35,4 +37,17 @@ defmodule Nodex.MixProject do
       # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"},
     ]
   end
+
+  defp package do
+    [
+      maintainers: ["Jean Parpaillon"],
+      licenses: ["Apache License 2.0"],
+      links: %{ "GitHub" => "https://github.com/kbrw/nodex"},
+      source_url: "https://github.com/kbrw/nodex"
+    ]
+  end
+
+  defp description, do: """
+  Embed a safe and reproductible node environment into your Elixir application
+  """
 end
