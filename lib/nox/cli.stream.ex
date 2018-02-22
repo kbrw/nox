@@ -1,7 +1,7 @@
-defmodule Nodex.Cli.Stream do
+defmodule Nox.Cli.Stream do
   require Logger
 
-  alias Nodex.Cli
+  alias Nox.Cli
 
   defstruct acc: "", parser: nil
 

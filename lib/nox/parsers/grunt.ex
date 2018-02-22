@@ -1,8 +1,8 @@
-defmodule Nodex.Parsers.Grunt do
+defmodule Nox.Parsers.Grunt do
   @moduledoc """
   Parser for Grunt
   """
-  use Nodex.Parser
+  use Nox.Parser
   
   require Logger
 

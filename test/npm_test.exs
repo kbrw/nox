@@ -6,7 +6,7 @@ defmodule NpmTest do
     File.mkdir_p!(tmpdir)
 
     File.cp!(Path.join(__DIR__, "package.json"), Path.join(tmpdir, "package.json"))
-    assert match? {:ok, _}, Nodex.Npm.install(tmpdir)
+    assert match? {:ok, _}, Nox.Npm.install(tmpdir)
     File.rm_rf!(tmpdir)
   end
 
@@ -15,7 +15,7 @@ defmodule NpmTest do
     File.mkdir_p!(tmpdir)
     
     File.write!(Path.join(tmpdir, "package.json"), "JUST CRAP")
-    assert match? {:error, _}, Nodex.Npm.install(tmpdir)
+    assert match? {:error, _}, Nox.Npm.install(tmpdir)
     File.rm_rf!(tmpdir)
   end
 end

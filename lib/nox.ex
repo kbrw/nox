@@ -1,8 +1,8 @@
-defmodule Nodex do
+defmodule Nox do
   @moduledoc """
   Wrappers for node and al. binaries
   """
-  alias Nodex.Nvm
+  alias Nox.Nvm
 
   @doc """
   Returns full path to managed executable
@@ -19,5 +19,5 @@ defmodule Nodex do
   Returns env for running node related commands
   """
   @spec env() :: [{String.t, String.t}]
-  def env, do: Nodex.Nvm.env()
+  def env, do: Nox.Nvm.env()
 end

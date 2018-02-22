@@ -1,9 +1,9 @@
-defmodule Nodex.Parsers.Logger do
+defmodule Nox.Parsers.Logger do
   @moduledoc """
   Default CLI parser.
   Output lines with Logger.info
   """
-  use Nodex.Parser
+  use Nox.Parser
 
   require Logger
 

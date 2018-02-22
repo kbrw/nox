@@ -1,8 +1,8 @@
-defmodule Nodex.Node do
+defmodule Nox.Node do
   @moduledoc """
   node.js wrapper
   """
-  alias Nodex.Semver
+  alias Nox.Semver
 
   @doc """
   Returns node version
@@ -16,5 +16,5 @@ defmodule Nodex.Node do
     end
   end
 
-  defp exe, do: Nodex.which("node")
+  defp exe, do: Nox.which("node")
 end

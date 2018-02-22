@@ -1,9 +1,9 @@
-defmodule Nodex.MixProject do
+defmodule Nox.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :nodex,
+      app: :nox,
       version: "0.1.0",
       elixir: ">= 1.3.0",
       start_permanent: Mix.env() == :prod,
@@ -16,8 +16,8 @@ defmodule Nodex.MixProject do
       ],
       deps: deps(),
       aliases: [
-	compile: ["nodex.install", "compile"],
-	clean: ["nodex.clean", "clean"]
+	compile: ["nox.install", "compile"],
+	clean: ["nox.clean", "clean"]
       ]
     ]
   end
@@ -41,8 +41,8 @@ defmodule Nodex.MixProject do
     [
       maintainers: ["Jean Parpaillon"],
       licenses: ["Apache License 2.0"],
-      links: %{ "GitHub" => "https://github.com/kbrw/nodex"},
-      source_url: "https://github.com/kbrw/nodex"
+      links: %{ "GitHub" => "https://github.com/kbrw/nox"},
+      source_url: "https://github.com/kbrw/nox"
     ]
   end
 

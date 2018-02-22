@@ -1,8 +1,8 @@
-defmodule Nodex.Nvm do
+defmodule Nox.Nvm do
   @moduledoc """
   NVM wrapper
   """
-  alias Nodex.Semver
+  alias Nox.Semver
 
   @doc """
   Run NVM command
@@ -10,7 +10,7 @@ defmodule Nodex.Nvm do
   @spec run(String.t) :: :ok | {:error, code :: integer}
   def run(args) do
     exe = Path.join [basedir(), "bin", "nodenv"]
-    case System.cmd(exe, String.split(args), env: env(), stderr_to_stdout: true, into: Nodex.Cli.stream()) do
+    case System.cmd(exe, String.split(args), env: env(), stderr_to_stdout: true, into: Nox.Cli.stream()) do
       {_, 0} -> :ok
       {_, code} -> {:error, code}
     end
@@ -27,7 +27,7 @@ defmodule Nodex.Nvm do
   end
 
   @doc false
-  def basedir, do: Path.join :code.priv_dir(:nodex), "nvm"
+  def basedir, do: Path.join :code.priv_dir(:nox), "nvm"
 
   @doc false
   def bindir, do: Path.join basedir(), "shims"

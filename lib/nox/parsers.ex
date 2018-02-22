@@ -1,4 +1,4 @@
-defmodule Nodex.Parser do
+defmodule Nox.Parser do
   @moduledoc """
   Defines Cli Parser behaviour
   """
@@ -14,7 +14,7 @@ defmodule Nodex.Parser do
 
   defmacro __using__(_args) do
     quote do
-      @behaviour Nodex.Parser
+      @behaviour Nox.Parser
 
       @doc false
       def terminate(state) do

@@ -1,8 +1,8 @@
-defmodule Nodex.Parsers.Npm do
+defmodule Nox.Parsers.Npm do
   @moduledoc """
   Parser for NPM
   """
-  use Nodex.Parser
+  use Nox.Parser
   
   require Logger
 

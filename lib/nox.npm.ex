@@ -1,11 +1,11 @@
-defmodule Nodex.Npm do
+defmodule Nox.Npm do
   @moduledoc """
   NPM wrapper
   """
   require Logger
   
-  alias Nodex.Semver
-  alias Nodex.Parsers.Npm, as: Parser
+  alias Nox.Semver
+  alias Nox.Parsers.Npm, as: Parser
 
   @typedoc "Options used by the `compile` function"
   @type compile_opts :: [compile_opt |install_opt]
@@ -85,7 +85,7 @@ defmodule Nodex.Npm do
   @doc """
   Returns full path to npm executable
   """
-  def exe, do: Nodex.which("npm")
+  def exe, do: Nox.which("npm")
 
   @doc """
   Return NODE_PATH for given project
@@ -97,15 +97,15 @@ defmodule Nodex.Npm do
   ###
   defp do_install(dir, args, opts) do
     werror = Keyword.get(opts, :werror, false)
-    stream = Nodex.Cli.stream({Parser, []})
-    npm_exe = Nodex.which("npm")
+    stream = Nox.Cli.stream({Parser, []})
+    npm_exe = Nox.which("npm")
     {parser, code} = System.cmd(npm_exe, args, cd: dir, into: stream, env: env(dir), stderr_to_stdout: true)
     do_finalize(code, parser, werror)
   end
   
   defp env(dir), do: [
     {"NODE_PATH", node_path(dir)}
-  ] ++ Nodex.Nvm.env()
+  ] ++ Nox.Nvm.env()
 
   defp do_finalize(0, %Parser{ warnings: [], errors: [] }, true), do: {:ok, []}
   defp do_finalize(0, %Parser{ warnings: warnings, errors: [] }, false), do: {:ok, warnings}

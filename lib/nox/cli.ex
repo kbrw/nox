@@ -1,13 +1,13 @@
-defmodule Nodex.Cli do
+defmodule Nox.Cli do
   @moduledoc """
   Utilities for playing with commands output
   """
-  alias Nodex.Parsers
-  alias Nodex.Cli
+  alias Nox.Parsers
+  alias Nox.Cli
 
   @doc """
   Returns a command-line stream collector, using given parser to parse output.
-  Default parser is Nodex.Parsers.Logger
+  Default parser is Nox.Parsers.Logger
   """
   @spec stream(parser :: {module, any}) :: %Cli.Stream{}
   def stream(parser_and_args \\ {Parsers.Logger, :info})

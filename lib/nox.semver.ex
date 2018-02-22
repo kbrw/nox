@@ -1,4 +1,4 @@
-defmodule Nodex.Semver do
+defmodule Nox.Semver do
   @moduledoc """
   Utils for semantic versions
   """
@@ -21,19 +21,19 @@ defmodule Nodex.Semver do
 
   ## Examples
 
-      iex> Nodex.cmp("1.4.7beta0", "1.3.2")
+      iex> Nox.cmp("1.4.7beta0", "1.3.2")
       1
 
-      iex> Nodex.cmp({1,4,7,"beta0"}, nil)
+      iex> Nox.cmp({1,4,7,"beta0"}, nil)
       1
 
-      iex> Nodex.cmp({1,4,7,"beta0"}, {1,3,8,"beta1"})
+      iex> Nox.cmp({1,4,7,"beta0"}, {1,3,8,"beta1"})
       1
 
-      iex> Nodex.cmp({1,4,7,"beta0"}, {1,3,8,"beta1"}, :major)
+      iex> Nox.cmp({1,4,7,"beta0"}, {1,3,8,"beta1"}, :major)
       0
 
-      iex> Nodex.cmp({1,2,7,"beta0"}, {1,3,8,"beta1"}, :minor)
+      iex> Nox.cmp({1,2,7,"beta0"}, {1,3,8,"beta1"}, :minor)
       -1
   """
   @spec cmp(a :: t | String.t, b :: t | String.t | any, until :: :major | :minor | :patch | :extra) :: -1 | 0 | 1
