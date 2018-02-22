@@ -1,3 +1,5 @@
+[![Build Status](https://secure.travis-ci.org/kbrw/nox.svg?branch=master "Build Status")](http://travis-ci.org/kbrw/nox)
+
 # Nox
 
 Embeds node, npm and provides wrappers for running it.
