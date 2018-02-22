@@ -18,7 +18,8 @@ defmodule Nox.MixProject do
       aliases: [
 	compile: ["nox.install", "compile"],
 	clean: ["nox.clean", "clean"]
-      ]
+      ],
+      docs: docs()
     ]
   end
 
@@ -49,4 +50,33 @@ defmodule Nox.MixProject do
   defp description, do: """
   Embed a safe and reproductible node environment into your Elixir application
   """
+
+  defp docs, do: [
+    main: "readme",
+    logo: "_doc/nox.png",
+    extras: [
+      "README.md"
+    ],
+    source_url: "https://github.com/kbrw/nox",
+    groups_for_modules: [
+      "Common": [
+    	Nox,
+    	Nox.Cli,
+    	Nox.Cli.Stream,
+    	Nox.Semver,
+    	Nox.Nvm
+      ],
+      "Wrappers": [
+    	Nox.Node,
+    	Nox.Npm,
+    	Nox.Grunt
+      ],
+      "Parsers": [
+    	Nox.Parser,
+    	Nox.Parsers.Logger,
+    	Nox.Parsers.Npm,
+    	Nox.Parsers.Grunt
+      ]
+    ]
+  ]
 end
