@@ -33,7 +33,7 @@ defmodule Nox.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:poison, "~> 3.1"},
+      {:poison, ">= 2.0.0"},
       {:ex_doc, ">= 0.0.0", only: :dev}
     ]
   end
