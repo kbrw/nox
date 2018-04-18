@@ -7,39 +7,43 @@ defmodule Nox.Nvm do
   @doc """
   Run NVM command
   """
-  @spec run(String.t) :: :ok | {:error, code :: integer}
-  def run(args) do
-    exe = Path.join [basedir(), "bin", "nodenv"]
-    case System.cmd(exe, String.split(args), env: env(), stderr_to_stdout: true, into: Nox.Cli.stream()) do
+  @spec run(Nox.Env.t, String.t | nil) :: :ok | {:error, code :: integer}
+  def run(env, args) do
+    exe = Path.join [basedir(env), "bin", "nodenv"]
+    case System.cmd(exe, String.split(args), env: sys_env(env), stderr_to_stdout: true, into: Nox.Cli.stream()) do
       {_, 0} -> :ok
       {_, code} -> {:error, code}
     end
   end
 
-  @doc false
-  def env do
-    bindir = bindir()
+  @doc """
+  Returns environment variables for working with this env
+  """
+  @spec sys_env(Nox.Env.t) :: [{String.t, String.t}]
+  def sys_env(env) do
+    bindir = bindir(env)
     path0 = System.get_env("PATH")
     [
       {"PATH", "#{bindir}:#{path0}"},
-      {"NODENV_ROOT", basedir()}
+      {"NODENV_ROOT", basedir(env)}
     ]
   end
 
   @doc false
-  def basedir, do: Path.join :code.priv_dir(:nox), "nvm"
+  def basedir(env), do: Path.join env.dir, "nvm"
 
   @doc false
-  def bindir, do: Path.join basedir(), "shims"
+  def bindir(env), do: Path.join basedir(env), "shims"
 
   @doc """
-  Returns installed nvm version
+  Returns true if installed version matches required one
   """
-  def version do
-    with out <- :os.cmd('git -C #{basedir()} describe 2> /dev/null'),
-	 {_, _, _, _}=semver <- Semver.parse(String.trim("#{out}")) do
-      semver
-    else _ -> :error
+  @spec stale?(Nox.Env.t) :: boolean
+  def stale?(env) do
+    with out <- :os.cmd('git -C #{basedir(env)} describe 2> /dev/null'),
+	 {_, _, _, _}=installed <- Semver.parse(String.trim("#{out}")) do
+      Semver.cmp(env.versions.nvm, installed, :minor) > 0
+    else _ -> false
     end
   end
 end

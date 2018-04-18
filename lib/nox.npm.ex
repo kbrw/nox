@@ -26,11 +26,11 @@ defmodule Nox.Npm do
 
   Can be forced with `force` opt
   """
-  @spec compile(Path.t, compile_opts) :: {:ok, warnings :: [String.t] | :uptodate} | {:error, {code :: number, warnings :: [String.t],  errors :: [String.t]}}
-  def compile(dir, opts \\ []) do
+  @spec compile(Nox.Env.t, Path.t, compile_opts) :: {:ok, warnings :: [String.t] | :uptodate} | {:error, {code :: number, warnings :: [String.t],  errors :: [String.t]}}
+  def compile(env, dir, opts \\ []) do
     force = Keyword.get(opts, :force, false)
     if force or Mix.Utils.stale?([Path.join(dir, "package.json")], [node_path(dir)]) do
-      install(dir, opts)
+      install(env, dir, opts)
     else
       {:ok, :uptodate}
     end
@@ -39,53 +39,53 @@ defmodule Nox.Npm do
   @doc """
   Launch npm install
   """
-  @spec install(Path.t, install_opts | Path.t, install_opts) :: {:ok, warnings :: [String.t]} | {:error, {code :: number, warnings :: [String.t],  errors :: [String.t]}}
-  def install(dir) when is_binary(dir), do: do_install(dir, ["install"], [])
-  def install(dir, opts) when is_binary(dir) and is_list(opts), do: do_install(dir, ["install"], opts)
-  def install(dir, archive) when is_binary(dir) and is_binary(archive), do: install(dir, archive, [])
-  def install(dir, archive, opts) when is_binary(dir) and is_binary(archive) and is_list(opts) do
+  @spec install(Nox.Env.t, Path.t, install_opts | Path.t, install_opts) :: {:ok, warnings :: [String.t]} | {:error, {code :: number, warnings :: [String.t],  errors :: [String.t]}}
+  def install(env, dir) when is_binary(dir), do: do_install(env, dir, ["install"], [])
+  def install(env, dir, opts) when is_binary(dir) and is_list(opts), do: do_install(env, dir, ["install"], opts)
+  def install(env, dir, archive) when is_binary(dir) and is_binary(archive), do: install(env, dir, archive, [])
+  def install(env, dir, archive, opts) when is_binary(dir) and is_binary(archive) and is_list(opts) do
     args = ["install"]
     args = if Keyword.get(opts, :no_save, false) do
       args ++ ["--no-save"]
     else
       args
     end
-    do_install(dir, args ++ [archive], opts)
+    do_install(env, dir, args ++ [archive], opts)
   end
 
   @doc """
   Install global
   """
-  @spec install_global(String.t, install_opts) :: {:ok, warnings :: [String.t]} | {:error, {code :: number, warnings :: [String.t],  errors :: [String.t]}}
-  def install_global(name, opts \\ []) when is_binary(name) and is_list(opts) do
-    do_install(File.cwd!(), ["install", "-g", name], opts)
+  @spec install_global(Nox.Env.t, String.t, install_opts) :: {:ok, warnings :: [String.t]} | {:error, {code :: number, warnings :: [String.t],  errors :: [String.t]}}
+  def install_global(env, name, opts \\ []) when is_binary(name) and is_list(opts) do
+    do_install(env, File.cwd!(), ["install", "-g", name], opts)
   end
 
   @doc """
   Clean up application 
   """
-  @spec clean(Path.t) :: :ok
-  def clean(dir) do
+  @spec clean(Nox.Env.t, Path.t) :: :ok
+  def clean(_, dir) do
     Logger.info("CLEAN #{dir}")
     File.rm_rf!(node_path(dir))
   end
 
   @doc """
-  Returns npm version
+  Returns true if installed version matches required one
   """
-  @spec version() :: Semver.t | nil
-  def version do
-    with exe when exe != nil <- exe(),
+  @spec stale?(Nox.Env.t) :: boolean
+  def stale?(env) do
+    with exe when exe != nil <- exe(env),
 	 {semver, 0} <- System.cmd(exe, ["--version"]) do
-      Semver.parse(String.trim(semver))
-    else _ -> :error
+      Semver.cmp(env.versions.npm, String.trim(semver), :minor) > 0
+    else _ -> false
     end
   end
 
   @doc """
   Returns full path to npm executable
   """
-  def exe, do: Nox.which("npm")
+  def exe(env), do: Nox.which("npm", env)
 
   @doc """
   Return NODE_PATH for given project
@@ -95,17 +95,17 @@ defmodule Nox.Npm do
   ###
   ### Priv
   ###
-  defp do_install(dir, args, opts) do
+  defp do_install(env, dir, args, opts) do
     werror = Keyword.get(opts, :werror, false)
     stream = Nox.Cli.stream({Parser, []})
-    npm_exe = Nox.which("npm")
-    {parser, code} = System.cmd(npm_exe, args, cd: dir, into: stream, env: env(dir), stderr_to_stdout: true)
+    npm_exe = Nox.which(env, "npm")
+    {parser, code} = System.cmd(npm_exe, args, cd: dir, into: stream, env: sys_env(dir, dir), stderr_to_stdout: true)
     do_finalize(code, parser, werror)
   end
   
-  defp env(dir), do: [
+  defp sys_env(env, dir), do: [
     {"NODE_PATH", node_path(dir)}
-  ] ++ Nox.Nvm.env()
+  ] ++ Nox.Nvm.sys_env(env)
 
   defp do_finalize(0, %Parser{ warnings: [], errors: [] }, true), do: {:ok, []}
   defp do_finalize(0, %Parser{ warnings: warnings, errors: [] }, false), do: {:ok, warnings}

@@ -21,17 +21,30 @@ The docs is available at [https://hexdocs.pm/nox](https://hexdocs.pm/nox)
 
 ## Usage
 
+Nox can manage multiple environments. All functions take as argument an environment.
+A default one can be obtained with:
+
+```elixir
+Nox.Env.default()
+```
+
+Custom ones can be built with:
+
+```elixir
+Nox.Env.new(options)
+```
+
 Get full path to executable:
 
 ```elixir
-Nox.which("node")
+Nox.which(env, "node")
 ```
 
 Get OS env for executing command in the node environment, for instance
 to give to `env` option of `System.cmd/3`:
 
 ```elixir
-env = Nox.env()
+env = Nox.sys_env(Nox.Env.default())
 System.cmd("aglio", ["-i", "doc.in", "-o", "doc.out"], env: env)
 ```
 

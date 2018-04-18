@@ -7,17 +7,17 @@ defmodule Nox do
   @doc """
   Returns full path to managed executable
   """
-  @spec which(String.t) :: Path.t | nil
-  def which(exe) do
-    case System.cmd("which", [exe], env: [{"PATH", Nvm.bindir()}]) do
+  @spec which(Nox.Env.t, String.t) :: Path.t | nil
+  def which(env, exe) do
+    case System.cmd("which", [exe], env: [{"PATH", Nvm.bindir(env)}]) do
       {out, 0} -> String.trim(out)
       {_, 1} -> nil
     end
   end
 
   @doc """
-  Returns env for running node related commands
+  Returns environment variables (OS) for running node related commands
   """
-  @spec env() :: [{String.t, String.t}]
-  def env, do: Nox.Nvm.env()
+  @spec sys_env(Nox.Env.t) :: [{String.t, String.t}]
+  def sys_env(env), do: Nox.Nvm.sys_env(env)
 end

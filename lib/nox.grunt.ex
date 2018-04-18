@@ -14,12 +14,12 @@ defmodule Nox.Grunt do
   @doc """
   Run grunt in the given dir
   """
-  @spec run(Path.t, opts) :: {:ok, warnings :: [String.t] | :uptodate} | {:error, {code :: number, warnings :: [String.t],  errors :: [String.t]}}
-  def run(dir, opts \\ []) do
+  @spec run(Nox.Env.t, Path.t, opts) :: {:ok, warnings :: [String.t] | :uptodate} | {:error, {code :: number, warnings :: [String.t],  errors :: [String.t]}}
+  def run(env, dir, opts \\ []) do
     args = if Keyword.get(opts, :force, false), do: ["--force"], else: []
     stream = Nox.Cli.stream({Parser, []})
     
-    case System.cmd("grunt", args, cd: dir, into: stream, env: Nox.Nvm.env(), stderr_to_stdout: true) do
+    case System.cmd("grunt", args, cd: dir, into: stream, env: Nox.Nvm.sys_env(env), stderr_to_stdout: true) do
       {%Parser{ warnings: warnings }, 0} -> {:ok, warnings}
       {%Parser{ warnings: warnings, errors: errors }, code} ->
 	{:error, {code, warnings, errors}}
