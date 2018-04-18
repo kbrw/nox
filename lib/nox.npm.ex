@@ -75,17 +75,29 @@ defmodule Nox.Npm do
   """
   @spec stale?(Nox.Env.t) :: boolean
   def stale?(env) do
+    case version(env) do
+      :error -> true
+      vsn -> Semver.cmp(env.versions[:npm], String.trim(vsn), :minor) != 0
+    end
+  end
+
+  @doc """
+  Returns real version given a dir
+  """
+  @spec version(Nox.Env.t | Path.t) :: String.t | :error
+  def version(dir) when is_binary(dir), do: version(Nox.Env.new(dir: dir))
+  def version(env) do
     with exe when exe != nil <- exe(env),
 	 {semver, 0} <- System.cmd(exe, ["--version"]) do
-      Semver.cmp(env.versions.npm, String.trim(semver), :minor) > 0
-    else _ -> false
-    end
+      String.trim(semver)
+    else _ -> :error
+    end    
   end
 
   @doc """
   Returns full path to npm executable
   """
-  def exe(env), do: Nox.which("npm", env)
+  def exe(env), do: Nox.which(env, "npm")
 
   @doc """
   Return NODE_PATH for given project
@@ -99,7 +111,7 @@ defmodule Nox.Npm do
     werror = Keyword.get(opts, :werror, false)
     stream = Nox.Cli.stream({Parser, []})
     npm_exe = Nox.which(env, "npm")
-    {parser, code} = System.cmd(npm_exe, args, cd: dir, into: stream, env: sys_env(dir, dir), stderr_to_stdout: true)
+    {parser, code} = System.cmd(npm_exe, args, cd: dir, into: stream, env: sys_env(env, dir), stderr_to_stdout: true)
     do_finalize(code, parser, werror)
   end
   

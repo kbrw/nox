@@ -40,10 +40,22 @@ defmodule Nox.Nvm do
   """
   @spec stale?(Nox.Env.t) :: boolean
   def stale?(env) do
-    with out <- :os.cmd('git -C #{basedir(env)} describe 2> /dev/null'),
-	 {_, _, _, _}=installed <- Semver.parse(String.trim("#{out}")) do
-      Semver.cmp(env.versions.nvm, installed, :minor) > 0
-    else _ -> false
+    case version(env) do
+      :error -> true
+      vsn -> Semver.cmp(env.versions[:nvm], vsn, :minor) != 0
+    end
+  end
+
+  @doc """
+  Returns real version from dir
+  """
+  @spec version(Path.t | Nox.Env.t) :: String.t
+  def version(dir) when is_binary(dir), do: version(Nox.Env.new(dir: dir))
+  def version(env) do
+    out = :os.cmd('git -C #{basedir(env)} describe 2> /dev/null')
+    case String.trim("#{out}") do
+      "" -> :error
+      vsn -> vsn
     end
   end
 end

@@ -23,7 +23,7 @@ defmodule Nox.Make do
 
     do_install_node(env, Nox.Node.stale?(env))
 
-    _ = Nox.Nvm.run(env, "global #{env.versions.node}")
+    _ = Nox.Nvm.run(env, "global #{env.versions[:node]}")
 
     :ok
   end
@@ -48,13 +48,13 @@ defmodule Nox.Make do
   defp do_install_nvm(env, true) do
     _ = clean(env)
 
-    Logger.info("INSTALL nodenv #{env.versions.nvm}")
+    Logger.info("INSTALL nodenv #{env.versions[:nvm]}")
     :ok = File.mkdir_p! Nox.Nvm.basedir(env)
 
     opts = [cd: Nox.Nvm.basedir(env), stderr_to_stdout: true]    
     {_, 0} = System.cmd("git", ["init"], opts)
     {_, 0} = System.cmd("git", ["remote", "add", "-f", "origin", @nvm_git_url], opts)
-    {_, 0} = System.cmd("git", ["checkout", env.versions.nvm], opts)
+    {_, 0} = System.cmd("git", ["checkout", env.versions[:nvm]], opts)
   end
 
   defp do_compile_nvm(_env, false), do: Logger.info("SKIP nodenv.compile (up-to-date)")
@@ -77,7 +77,7 @@ defmodule Nox.Make do
 
   defp do_install_node(_env, false), do: Logger.info("SKIP node.install (up-to-date)")
   defp do_install_node(env, true) do
-    Logger.info("INSTALL node #{env.versions.node}")
-    _ = Nox.Nvm.run(env, "install #{env.versions.node}")
+    Logger.info("INSTALL node #{env.versions[:node]}")
+    _ = Nox.Nvm.run(env, "install #{env.versions[:node]}")
   end
 end

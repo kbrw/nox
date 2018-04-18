@@ -9,12 +9,17 @@ defmodule Nox.MixProject do
     description: description(),
     package: package(),
     deps: deps(),
-    docs: docs()
+    docs: docs(),
+    aliases: aliases()
   ]
 
   # Run "mix help compile.app" to learn about applications.
   def application, do: [
     extra_applications: [:logger]
+  ]
+
+  defp aliases, do: [
+    "test": ["compile.nox", "test"]
   ]
 
   # Run "mix help deps" to learn about dependencies.
