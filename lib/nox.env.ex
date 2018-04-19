@@ -1,6 +1,10 @@
 defmodule Nox.Env do
   @moduledoc """
   Environment of node installation
+  
+  If new/1 is called with `shared: true`, directory is built from a hash
+  of (parsed) versions and thus, will be shared between all envs using 
+  these versions.
   """
   alias Nox.Semver
 
@@ -58,6 +62,6 @@ defmodule Nox.Env do
 	vhash = :erlang.phash2({util, Semver.parse(vsn)})
 	:crypto.hash_update(ctx, "#{vhash}")
     end) |> :crypto.hash_final() |> Base.url_encode64()
-    Path.join Application.get_env(:nox, :shared_dir), hash
+    Path.join Application.get_env(:nox, :shared_dir), "nox-#{hash}"
   end
 end
