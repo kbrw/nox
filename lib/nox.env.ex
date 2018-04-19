@@ -12,6 +12,7 @@ defmodule Nox.Env do
 
   @type options :: [option]
   @type option :: {:dir, Path.t}
+                | {:shared, boolean}
                 | {:node, String.t}
                 | {:nvm, String.t}
 		| {:npm, String.t}
@@ -27,20 +28,36 @@ defmodule Nox.Env do
     {_, _, _, _} = Semver.parse(Keyword.get(options, :nvm, @default_nvm))
     {_, _, _, _} = Semver.parse(Keyword.get(options, :node, @default_node))
     {_, _, _, _} = Semver.parse(Keyword.get(options, :npm, @default_npm))
+
+    versions = [
+      nvm: Keyword.get(options, :nvm, @default_nvm),
+      node: Keyword.get(options, :node, @default_node),
+      npm: Keyword.get(options, :npm, @default_npm)
+    ]
+    dir = if Keyword.get(options, :shared, false) do
+      find_shared(versions)
+    else
+      Keyword.get_lazy(options, :dir, fn -> :code.priv_dir(:nox) end)
+    end	    
     
-    %__MODULE__{
-      dir: Keyword.get_lazy(options, :dir, fn -> :code.priv_dir(:nox) end),
-      versions: [
-	nvm: Keyword.get(options, :nvm, @default_nvm),
-	node: Keyword.get(options, :node, @default_node),
-	npm: Keyword.get(options, :npm, @default_npm)
-      ]
-    }
+    %__MODULE__{ dir: dir, versions: versions }
   end
 
   @doc """
   Creates default env
   """
   @spec default() :: t
-  def default, do: new()
+  def default, do: new(shared: false)
+
+  ###
+  ### Priv
+  ###
+  def find_shared(versions) do
+    hash = Enum.reduce(versions, :crypto.hash_init(:sha256), fn
+      {util, vsn}, ctx ->
+	vhash = :erlang.phash2({util, Semver.parse(vsn)})
+	:crypto.hash_update(ctx, "#{vhash}")
+    end) |> :crypto.hash_final() |> Base.url_encode64()
+    Path.join Application.get_env(:nox, :shared_dir), hash
+  end
 end
