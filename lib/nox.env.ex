@@ -57,11 +57,14 @@ defmodule Nox.Env do
   ### Priv
   ###
   def find_shared(versions) do
-    hash = Enum.reduce(versions, :crypto.hash_init(:sha256), fn
-      {util, vsn}, ctx ->
-	vhash = :erlang.phash2({util, Semver.parse(vsn)})
+    hash = Enum.sort(versions) |>
+      Enum.reduce(:crypto.hash_init(:sha256), fn
+	{util, vsn}, ctx ->
+	  vhash = :erlang.phash2({util, Semver.parse(vsn)})
 	:crypto.hash_update(ctx, "#{vhash}")
-    end) |> :crypto.hash_final() |> Base.url_encode64()
+      end) |>
+      :crypto.hash_final() |>
+      Base.url_encode64()
     Path.join Application.get_env(:nox, :shared_dir), "nox-#{hash}"
   end
 end
