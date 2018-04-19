@@ -65,6 +65,16 @@ defmodule Nox.Env do
       end) |>
       :crypto.hash_final() |>
       Base.url_encode64()
-    Path.join Application.get_env(:nox, :shared_dir), "nox-#{hash}"
+    Path.join writable_shared(), "nox-#{hash}"
+  end
+
+  defp writable_shared do
+    with dir when dir != nil <- Application.get_env(:nox, :shared_dir),
+	 :ok <- File.mkdir_p(dir),
+	 {:ok, %File.Stat{ access: :read_write }} <- File.stat(dir) do
+      dir
+    else
+      _ -> System.tmp_dir!()
+    end
   end
 end
