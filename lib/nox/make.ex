@@ -4,6 +4,8 @@ defmodule Nox.Make do
   """
   require Logger
 
+  alias Nox.Utils
+
   @nvm_git_url "https://github.com/nodenv/nodenv"
   @node_build_url "https://github.com/nodenv/node-build.git"
 	
@@ -16,7 +18,7 @@ defmodule Nox.Make do
 
     src = Path.join [Nox.Nvm.basedir(env), "src", "realpath.c"]
     target = Path.join [Nox.Nvm.basedir(env), "libexec", "nodenv-realpath.dylib"]
-    do_compile_nvm(env, Mix.Utils.stale?([src], [target]))
+    do_compile_nvm(env, Utils.stale?([src], [target]))
 
     destdir = Path.join([Nox.Nvm.basedir(env), "plugins", "node-build"])
     do_install_node_build(env, not File.exists?(destdir))

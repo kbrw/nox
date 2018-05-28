@@ -3,7 +3,8 @@ defmodule Nox.Npm do
   NPM wrapper
   """
   require Logger
-  
+
+  alias Nox.Utils
   alias Nox.Semver
   alias Nox.Parsers.Npm, as: Parser
 
@@ -29,7 +30,7 @@ defmodule Nox.Npm do
   @spec compile(Nox.Env.t, Path.t, compile_opts) :: {:ok, warnings :: [String.t] | :uptodate} | {:error, {code :: number, warnings :: [String.t],  errors :: [String.t]}}
   def compile(env, dir, opts \\ []) do
     force = Keyword.get(opts, :force, false)
-    if force or Mix.Utils.stale?([Path.join(dir, "package.json")], [node_path(dir)]) do
+    if force or Utils.stale?([Path.join(dir, "package.json")], [node_path(dir)]) do
       install(env, dir, opts)
     else
       {:ok, :uptodate}
