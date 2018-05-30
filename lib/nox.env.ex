@@ -34,7 +34,7 @@ defmodule Nox.Env do
     {_, _, _, _} = Semver.parse(Keyword.get(options, :node, @default_node))
     {_, _, _, _} = Semver.parse(Keyword.get(options, :npm, @default_npm))
     Keyword.get(options, :versions, []) |>
-      Enum.each(fn vsn ->
+      Enum.each(fn {_name, vsn} ->
 	{_, _, _, _} = Semver.parse(vsn)
       end)
 
