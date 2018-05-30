@@ -20,6 +20,7 @@ defmodule Nox.Env do
                 | {:node, String.t}
                 | {:nvm, String.t}
 		| {:npm, String.t}
+		| {:versions, Keyword.t}
 
   @type t :: %__MODULE__{}
 
@@ -32,12 +33,17 @@ defmodule Nox.Env do
     {_, _, _, _} = Semver.parse(Keyword.get(options, :nvm, @default_nvm))
     {_, _, _, _} = Semver.parse(Keyword.get(options, :node, @default_node))
     {_, _, _, _} = Semver.parse(Keyword.get(options, :npm, @default_npm))
+    Keyword.get(options, :versions, []) |>
+      Enum.each(fn vsn ->
+	{_, _, _, _} = Semver.parse(vsn)
+      end)
 
-    versions = [
+    versions = Keyword.merge([
       nvm: Keyword.get(options, :nvm, @default_nvm),
       node: Keyword.get(options, :node, @default_node),
       npm: Keyword.get(options, :npm, @default_npm)
-    ]
+    ], Keyword.get(options, :versions, []))
+    
     dir = if Keyword.get(options, :shared, false) do
       find_shared(versions)
     else
