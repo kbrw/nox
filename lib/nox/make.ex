@@ -46,7 +46,7 @@ defmodule Nox.Make do
   ###
   ### Priv
   ###
-  defp do_install_nvm(_env, false), do: Logger.info("SKIP nodenv.install (up-to-date)")
+  defp do_install_nvm(_env, false), do: :ok
   defp do_install_nvm(env, true) do
     _ = clean(env)
 
@@ -59,7 +59,7 @@ defmodule Nox.Make do
     {_, 0} = System.cmd("git", ["checkout", env.versions[:nvm]], opts)
   end
 
-  defp do_compile_nvm(_env, false), do: Logger.info("SKIP nodenv.compile (up-to-date)")
+  defp do_compile_nvm(_env, false), do: :ok
   defp do_compile_nvm(env, true) do
     Logger.info("COMPILE nodenv")
 
@@ -69,7 +69,7 @@ defmodule Nox.Make do
     {_, 0} = System.cmd("make", ["-C", srcdir], cd: Nox.Nvm.basedir(env), stderr_to_stdout: true, into: Nox.Cli.stream())
   end
 
-  defp do_install_node_build(_env, false), do: Logger.info("SKIP node-build.install (up-to-date)")
+  defp do_install_node_build(_env, false), do: :ok
   defp do_install_node_build(env, true) do
     Logger.info("INSTALL node-build")
 
@@ -77,7 +77,7 @@ defmodule Nox.Make do
     {_, 0} = System.cmd("git", ["clone", @node_build_url, destdir], stderr_to_stdout: true)    
   end
 
-  defp do_install_node(_env, false), do: Logger.info("SKIP node.install (up-to-date)")
+  defp do_install_node(_env, false), do: :ok
   defp do_install_node(env, true) do
     Logger.info("INSTALL node #{env.versions[:node]}")
     _ = Nox.Nvm.run(env, "install #{env.versions[:node]}")
