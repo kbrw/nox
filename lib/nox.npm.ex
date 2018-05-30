@@ -2,6 +2,8 @@ defmodule Nox.Npm do
   @moduledoc """
   NPM wrapper
   """
+  use Nox.Bin, name: "npm"
+  
   require Logger
 
   alias Nox.Utils
@@ -72,39 +74,21 @@ defmodule Nox.Npm do
   end
 
   @doc """
-  Returns true if installed version matches required one
-  """
-  @spec stale?(Nox.Env.t) :: boolean
-  def stale?(env) do
-    case version(env) do
-      :error -> true
-      vsn -> Semver.cmp(env.versions[:npm], String.trim(vsn), :minor) != 0
-    end
-  end
-
-  @doc """
-  Returns real version given a dir
-  """
-  @spec version(Nox.Env.t | Path.t) :: String.t | :error
-  def version(dir) when is_binary(dir), do: version(Nox.Env.new(dir: dir))
-  def version(env) do
-    with exe when exe != nil <- exe(env),
-	 {semver, 0} <- System.cmd(exe, ["--version"]) do
-      String.trim(semver)
-    else _ -> :error
-    end    
-  end
-
-  @doc """
-  Returns full path to npm executable
-  """
-  def exe(env), do: Nox.which(env, "npm")
-
-  @doc """
   Return NODE_PATH for given project
   """
   def node_path(dir), do: Path.join(dir, "node_modules")
-  
+
+  ###
+  ### Nox.Bin callback
+  ###  
+  @doc false
+  def do_version(binpath) do
+    with {semver, 0} <- System.cmd(binpath, ["--version"]) do
+      String.trim(semver)
+    else _ -> :error
+    end
+  end
+
   ###
   ### Priv
   ###

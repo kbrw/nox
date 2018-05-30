@@ -2,6 +2,8 @@ defmodule Nox.Grunt do
   @moduledoc """
   Grunt wrapper
   """
+  use Nox.Bin, name: "grunt"
+  
   alias Nox.Parsers.Grunt, as: Parser
 
   @typedoc "Options used by the `run` function"
@@ -23,6 +25,17 @@ defmodule Nox.Grunt do
       {%Parser{ warnings: warnings }, 0} -> {:ok, warnings}
       {%Parser{ warnings: warnings, errors: errors }, code} ->
 	{:error, {code, warnings, errors}}
+    end
+  end
+
+  ###
+  ### Nox.Bin callback
+  ###
+  @doc false
+  def do_version(binpath) do
+    case System.cmd(binpath, ["--version"]) do
+      {"grunt-cli " <> semver, 0} -> String.trim(semver)
+      _ -> :error
     end
   end
 end

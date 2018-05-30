@@ -14,6 +14,7 @@ defmodule Nox.Utils do
   Returns `true` if any of the `sources` are stale
   compared to the given `targets`.
   """
+  @spec stale?([Path.t], [Path.t]) :: boolean
   def stale?(sources, targets) do
     Enum.any?(stale_stream(sources, targets))
   end
@@ -24,6 +25,7 @@ defmodule Nox.Utils do
   If the path does not exist, it returns the Unix epoch
   (1970-01-01 00:00:00).
   """
+  @spec last_modified(Path.t) :: integer
   def last_modified(path)
 
   def last_modified(timestamp) when is_integer(timestamp) do
