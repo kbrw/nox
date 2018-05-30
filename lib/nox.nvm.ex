@@ -33,7 +33,10 @@ defmodule Nox.Nvm do
   def basedir(env), do: Path.join env.dir, "nvm"
 
   @doc false
-  def bindir(env), do: Path.join basedir(env), "shims"
+  def bindir(env) do
+    [bindir] = Path.wildcard(Path.join([basedir(env), "versions", "*", "bin"]))
+    bindir
+  end
 
   @doc """
   Returns true if installed version matches required one
