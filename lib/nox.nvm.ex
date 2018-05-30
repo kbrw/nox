@@ -34,8 +34,10 @@ defmodule Nox.Nvm do
 
   @doc false
   def bindir(env) do
-    [bindir] = Path.wildcard(Path.join([basedir(env), "versions", "*", "bin"]))
-    bindir
+    case Path.wildcard(Path.join([basedir(env), "versions", "*", "bin"])) do
+      [] -> nil
+      [ bindir ] -> bindir
+    end
   end
 
   @doc """
