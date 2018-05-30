@@ -11,4 +11,15 @@ defmodule Nox.Node do
       _ -> :error
     end
   end
+
+  @doc """
+  Eval a javascript code in given env
+  """
+  @spec eval(Nox.Env.t, String.t) :: {:ok, String.t} | :error
+  def eval(env, code) do
+    case System.cmd(which(env), ["-p", code]) do
+      {out, 0} -> {:ok, out}
+      _ -> :error
+    end
+  end
 end
