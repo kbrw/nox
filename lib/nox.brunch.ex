@@ -11,4 +11,16 @@ defmodule Nox.Brunch do
     else _ -> :error
     end
   end
+
+  @doc """
+  Install brunch in env
+  """
+  @spec make(Nox.Env.t) :: {:ok, warnings :: []} | {:error, term}
+  def make(env) do
+    if stale?(env) do
+      Nox.Npm.install_global(env, "brunch")
+    else
+      {:ok, []}
+    end
+  end
 end
